@@ -9,6 +9,7 @@ jobs:
     steps:        
       - name: Create container
         run: |
+          HOME=$GITHUB_WORKSPACE
           cd ~
           
           git config --global user.email "uazo@users.noreply.github.com"
