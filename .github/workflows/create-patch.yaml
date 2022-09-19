@@ -63,7 +63,5 @@ jobs:
           path: kiwi-as-a-patch
           commit-message: 'AUTOMATED - autoupdate'
           title: AUTOMATED - autoupdate
-          add-paths: |
-            ~/kiwi-as-a-patch/*
           delete-branch: true
           branch-suffix: short-commit-hash
