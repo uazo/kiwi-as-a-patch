@@ -9,6 +9,8 @@ jobs:
     steps:        
       - name: Create container
         run: |
+          cd ~
+          
           git clone https://github.com/uazo/bromite-buildtools
           mkdir -p ~/bromite/build/patches-new/
 
