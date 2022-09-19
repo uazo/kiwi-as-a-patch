@@ -1,0 +1,63 @@
+name: Create Patch
+  
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:        
+      - name: Create container
+        run: |
+          git clone https://github.com/uazo/bromite-buildtools
+          mkdir -p ~/bromite/build/patches-new/
+
+          git clone https://github.com/uazo/kiwi-as-a-patch
+          cd ~/kiwi-as-a-patch
+          rm -rf $(find . -maxdepth 1 ! -name .git ! -name LICENSE ! -name . | -name .github)
+
+          PATCH_NAME=kiwi.patch
+          wget https://raw.githubusercontent.com/kiwibrowser/src.next/kiwi/CHROMIUM_VERSION
+          VERSION=$(echo $(cat CHROMIUM_VERSION | cut -d'=' -f2) | sed 's/ /./g')
+
+          mkdir -p ~/chromium/src
+          cd ~/chromium/src
+
+          CHR_SOURCE=https://github.com/chromium/chromium.git
+          git init
+          git remote add origin $CHR_SOURCE
+          git fetch --depth 2 $CHR_SOURCE +refs/tags/$VERSION:chromium_$VERSION
+          git checkout $VERSION
+          cd ..
+
+          mkdir second && cd second
+          git init
+          git remote add origin https://github.com/kiwibrowser/src.next.git
+          git fetch --depth 1 https://github.com/kiwibrowser/src.next.git kiwi
+          git checkout FETCH_HEAD
+
+          rm -rf .build/ .git/ .github/
+          cp -r . ~/chromium/src/
+
+          cd ~/chromium/src/
+          git add .
+
+          cp --parents $(git diff --name-only --cached) ~/kiwi-as-a-patch
+
+          git commit -m "Diff from $VERSION" -m "FILE:$PATCH_NAME"
+          bash ~/bromite-buildtools/export-single-patch.sh $(git rev-parse HEAD) $PATCH_NAME
+          cp ~/bromite/build/patches-new/$PATCH_NAME ~/kiwi-as-a-patch
+
+          cd ~/kiwi-as-a-patch
+          git add .
+          git commit -m "Diff from $VERSION"
+          
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@dcd5fd746d53dd8de555c0f10bca6c35628be47a #v3.12.0
+        if: env.CHANGES == '1'
+        with:
+          path: kiwi-as-a-patch
+          commit-message: 'AUTOMATED - autoupdate'
+          title: AUTOMATED - autoupdate
+          delete-branch: true
+          branch-suffix: short-commit-hash
