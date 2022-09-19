@@ -16,7 +16,7 @@ jobs:
 
           git clone https://github.com/uazo/kiwi-as-a-patch
           cd ~/kiwi-as-a-patch
-          rm -rf $(find . -maxdepth 1 ! -name .git ! -name LICENSE ! -name . | -name .github)
+          rm -rf $(find . -maxdepth 1 ! -name .git ! -name LICENSE ! -name . ! -name .github)
 
           PATCH_NAME=kiwi.patch
           wget https://raw.githubusercontent.com/kiwibrowser/src.next/kiwi/CHROMIUM_VERSION
