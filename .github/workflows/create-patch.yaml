@@ -11,6 +11,9 @@ jobs:
         run: |
           cd ~
           
+          git config --global user.email "uazo@users.noreply.github.com"
+          git config --global user.name "AUTOMATED"
+
           git clone https://github.com/uazo/bromite-buildtools
           mkdir -p ~/bromite/build/patches-new/
 
